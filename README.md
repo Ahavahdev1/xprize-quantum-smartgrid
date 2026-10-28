@@ -1,15 +1,15 @@
 # Autonomous Sub-Second Microgrid Dynamic Phase Balancing via Native LLVM-Compiled Concave Ising Annealing
 
-[![Track](https://img.shields.io/badge/Track-Quantum--Inspired%20%26%20Near--Term%20Quantum-blueviolet)](https://github.com/Ahavahdev1/xprize-quantum-smartgrid)
+[![Track](https://img.shields.io/badge/Track-Quantum--Inspired%20Applications-blueviolet)](https://github.com/Ahavahdev1/xprize-quantum-smartgrid)
 [![SDG 7](https://img.shields.io/badge/UN%20SDG-7%20Affordable%20%26%20Clean%20Energy-orange)](https://sdgs.un.org/goals/goal7)
 [![SDG 13](https://img.shields.io/badge/UN%20SDG-13%20Climate%20Action-green)](https://sdgs.un.org/goals/goal13)
-[![License: Open Data & Verifier](https://img.shields.io/badge/License-Verification%20Harness%20Open%20Access-brightgreen)](LICENSE)
-[![Status: Patent Pending](https://img.shields.io/badge/Intellectual%20Property-Patent%20Pending-red)](#-intellectual-property--patent-pending-notice)
+[![License: Open Verifier](https://img.shields.io/badge/License-Open%20Verifier%20Harness-brightgreen)](https://github.com/Ahavahdev1/xprize-quantum-smartgrid)
+[![Status: Patent Pending](https://img.shields.io/badge/IP%20Status-Patent%20Pending-red)](#-intellectual-property--patent-pending-notice)
 
 **Primary UN Sustainable Development Goals:** SDG 7 (Affordable and Clean Energy), SDG 13 (Climate Action), SDG 9 (Industry, Innovation, and Infrastructure)  
 **Lead Architect & Author:** Bruno Loureiro Desidera  
 **Algorithmic Framework:** MEA v14.5 "Quantum Core" Architecture  
-**Repository:** [https://github.com/Ahavahdev1/xprize-quantum-smartgrid](https://github.com/Ahavahdev1/xprize-quantum-smartgrid)
+**Official Repository:** [https://github.com/Ahavahdev1/xprize-quantum-smartgrid](https://github.com/Ahavahdev1/xprize-quantum-smartgrid)
 
 ---
 
@@ -17,7 +17,7 @@
 
 https://github.com/Ahavahdev1/xprize-quantum-smartgrid/raw/main/xprize_demo.mp4
 
-> **Telemetry Video Verification:** The demonstration above documents the end-to-end execution of the MEA v14.5 engine resolving 2,000 grid endpoints across 50 shared-neutral feeders in **16.51 seconds** (sub-second per feeder), followed by the execution of the independent physics auditor verifying 99.64% parasitic current elimination.
+> **Telemetry Video Verification:** The demonstration video above documents the live execution of the MEA v14.5 engine resolving 2,000 grid endpoints across 50 shared-neutral feeders in **16.51 seconds** (sub-second per feeder cluster), followed by the instant physics auditor verifying **99.64%** neutral current cancellation.
 
 ---
 
@@ -26,22 +26,27 @@ https://github.com/Ahavahdev1/xprize-quantum-smartgrid/raw/main/xprize_demo.mp4
 > **LEGAL NOTICE & REPRODUCIBILITY FRAMEWORK:**  
 > The underlying optimization engine (**MEA v14.5 Concave Annealing Engine**), its subcritical concave cooling trajectory ($\gamma = 1.45$), native LLVM SIMD compilation pipeline, Compressed Sparse Row (CSR) memory mapping, and zero-energy boundary quench mechanics are proprietary intellectual property subject to international patent applications (**Patent Pending**).
 >
-> To ensure open scientific scrutiny, objective verification, and reproducibility without compromising active patent filings:
+> To support scientific peer review, verification, and auditability without compromising active patent filings:
 > 1. **Complete Problem Topology:** The full IEEE-standard testbed parameters ($N = 2,000$ loads/prosumers, 50 feeders) and the exact antiferromagnetic Ising Hamiltonian formulation are published openly in `data_ieee_2000.json`.
 > 2. **Ground-Truth Solution Vector:** The exact phase allocation vector ($s^* \in \{-1, +1\}^{2000}$) calculated by the MEA engine is fully provided in `solution_ground_truth.json`.
-> 3. **Independent Physics Verifier:** An open-source, pure Python/NumPy verification script (`audit_benchmark.py`) is provided to allow any independent auditor to verify the 99.64% neutral loss elimination from first physical principles (Kirchhoff’s Current Law & Joule's Heating Law) in $<0.2$ seconds.
+> 3. **Independent Physics Verifier:** An open-source, pure Python/NumPy verification script (`audit_benchmark.py`) is provided so any independent auditor can verify the 99.64% neutral loss elimination from first physical principles (Kirchhoff & Joule laws) in $<0.2$ seconds.
 > 4. **Commercial & Academic Inquiries:** Utilities and research labs seeking access to the native compilation kernel under a Non-Disclosure Agreement (NDA) should contact the lead author.
 
 ---
 
 ## 1. Executive Summary & Problem Formulation
 
-The rapid global adoption of behind-the-meter rooftop solar photovoltaics (PV) and intermittent electric vehicle (EV) charging has disrupted the symmetrical design of distribution feeders. Asymmetrical power draw and injection between phases (Phase A vs. Phase B) result in heavy **neutral return currents ($I_{\text{neutral}}$)**, causing:
+Modern power distribution networks suffer from severe asymmetric phase loading caused by rooftop solar photovoltaics (PV) and localized electric vehicle (EV) charging. Asymmetrical power draw and injection between phases (Phase A vs. Phase B) result in heavy **neutral return currents ($I_{\text{neutral}}$)**, causing:
+
 * **Severe Thermal Stress & Transformer Failure:** Neutral lines, often unmonitored and undersized, overheat rapidly, degrading transformers and creating fire hazards.
 * **Parasitic Grid Technical Heat Losses:** Following Joule’s Law ($P_{\text{loss}} = R_{\text{neutral}} \cdot I_{\text{neutral}}^2$), parasitic dissipation scales quadratically with phase unbalance. According to the IEA, technical transmission & distribution losses waste over 1.0 Gt of $\text{CO}_2$ equivalent per year.
 * **The Combinatorial Bottleneck:** Dynamically reassigning $N = 2,000$ loads between phases represents a discrete search space of:
-  $$\text{Search Space} = 2^{2000} \approx 1.14 \times 10^{602} \text{ configurations}$$
-  Conventional Mixed-Integer Non-Linear Programming (MINLP) solvers (e.g., standard Branch-and-Bound) take 15 to 45 minutes to converge—far exceeding real-time grid switching windows ($<30$ seconds) before solar irradiance changes.
+
+$$
+\text{Search Space} = 2^{2000} \approx 1.14 \times 10^{602} \text{ combinations}
+$$
+
+Conventional Mixed-Integer Non-Linear Programming (MINLP) solvers take 15 to 45 minutes to converge—far exceeding real-time grid switching windows ($<30$ seconds) before solar irradiance changes.
 
 ---
 
@@ -50,17 +55,28 @@ The rapid global adoption of behind-the-meter rooftop solar photovoltaics (PV) a
 Let a regional smart network be partitioned into $M = 50$ independent shared-neutral feeders. Each feeder $f \in \{1, \dots, M\}$ contains a subset of loads $\mathcal{V}_f$, where $\sum |\mathcal{V}_f| = N = 2,000$.
 
 Each node $i \in \mathcal{V}_f$ has an instantaneous active current $I_i \in \mathbb{R}$ (positive for net consumers, negative for solar/wind prosumers). The phase allocation decision is defined as an Ising spin:
-$$s_i \in \{-1, +1\} \quad (s_i = +1 \implies \text{Phase A}, \quad s_i = -1 \implies \text{Phase B})$$
+
+$$
+s_i \in \{-1, +1\} \quad (s_i = +1 \implies \text{Phase A}, \quad s_i = -1 \implies \text{Phase B})
+$$
 
 The neutral return current for feeder $f$ is:
-$$I_{\text{neutral}, f} = \sum_{i \in \mathcal{V}_f} I_i \cdot s_i$$
+
+$$
+I_{\text{neutral}, f} = \sum_{i \in \mathcal{V}_f} I_i \cdot s_i
+$$
 
 To minimize thermal losses, the global physical objective is the sum of squared neutral currents:
-$$H_{\text{grid}} = \sum_{f=1}^{M} I_{\text{neutral}, f}^2 = \sum_{f=1}^{M} \left( \sum_{i \in \mathcal{V}_f} I_i s_i \right)^2 = \sum_{f=1}^{M} \left( \sum_{i \in \mathcal{V}_f} I_i^2 s_i^2 + 2 \sum_{i < j \in \mathcal{V}_f} I_i I_j s_i s_j \right)$$
+
+$$
+H_{\text{grid}} = \sum_{f=1}^{M} I_{\text{neutral}, f}^2 = \sum_{f=1}^{M} \left( \sum_{i \in \mathcal{V}_f} I_i s_i \right)^2 = \sum_{f=1}^{M} \left( \sum_{i \in \mathcal{V}_f} I_i^2 s_i^2 + 2 \sum_{i < j \in \mathcal{V}_f} I_i I_j s_i s_j \right)
+$$
 
 Because $s_i^2 = 1$ is invariant, the first term is a constant offset: $\sum I_i^2 = \text{Const}$. Thus, the problem reduces strictly to a **pairwise antiferromagnetic Ising spin glass with zero external linear magnetic field ($h_i = 0$)**:
 
-$$H_{\text{Ising}}(s) = \sum_{f=1}^{M} \sum_{i < j \in \mathcal{V}_f} J_{ij} \cdot s_i s_j, \quad \text{where } J_{ij} = 2 \cdot \left(\frac{I_i}{I_{\max}}\right) \left(\frac{I_j}{I_{\max}}\right)$$
+$$
+H_{\text{Ising}}(s) = \sum_{f=1}^{M} \sum_{i < j \in \mathcal{V}_f} J_{ij} \cdot s_i s_j, \quad \text{where } J_{ij} = 2 \cdot \left(\frac{I_i}{I_{\max}}\right) \left(\frac{I_j}{I_{\max}}\right)
+$$
 
 ### Microscopic Frustration Dynamics:
 * **Consumer–Consumer Interaction ($I_i > 0, I_j > 0 \implies J_{ij} > 0$):** Energy is minimized when $s_i s_j = -1 \implies s_i \neq s_j$. Heavy consumer loads naturally repel each other into opposite phases.
@@ -239,7 +255,6 @@ Avoided Emissions=9,279.5×0.475≈4,407.7 Metric Tons of CO
 2
 ​
  /year
-
 (Equivalent to removing approximately 960 gasoline-powered passenger vehicles per 2,000-bus regional cluster).
 Global Scale-Up (1,000 Substations):
 Direct Energy Conserved: 
